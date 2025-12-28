@@ -1,291 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blood Group Classifier</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #e74c3c;
-            --secondary-color: #c0392b;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --info-color: #3498db;
-            --light-color: #f8f9fa;
-        }
+{% extends "base.html" %}
 
-        body {
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Background image with soft gradient overlay */
-            background-image:
-                linear-gradient(rgba(40, 44, 52, 0.35), rgba(40, 44, 52, 0.35)),
-                url('/static/lab_bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-color: #2f3340; /* fallback */
-        }
+{% block title %}BloodPrint • Classify{% endblock %}
 
-        .main-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 2rem 0;
-        }
+{% block head_extras %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            -webkit-backdrop-filter: blur(10px); /* Safari fix */
-            backdrop-filter: blur(10px);    
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border-radius: 20px 20px 0 0 !important;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .card-header h1 {
-            margin: 0;
-            font-weight: 300;
-            font-size: 2.5rem;
-        }
-
-        .card-header .subtitle {
-            opacity: 0.9;
-            margin-top: 0.5rem;
-        }
-
-        .upload-section {
-            padding: 3rem;
-        }
-
-        .upload-area {
-            border: 3px dashed #dee2e6;
-            border-radius: 15px;
-            padding: 3rem 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background: linear-gradient(45deg, #f8f9fa, #ffffff);
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary-color);
-            background: linear-gradient(45deg, #ffffff, #f8f9fa);
-            transform: translateY(-2px);
-        }
-
-        .upload-area.dragover {
-            border-color: var(--success-color);
-            background: rgba(39, 174, 96, 0.1);
-        }
-
-        .upload-icon {
-            font-size: 4rem;
-            color: #6c757d;
-            margin-bottom: 1rem;
-        }
-
-        .upload-area:hover .upload-icon {
-            color: var(--primary-color);
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .btn-upload {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-            color: white;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .btn-upload:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            color: white;
-        }
-
-        .prediction-result {
-            margin-top: 2rem;
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-        }
-
-        .result-success {
-            background: linear-gradient(135deg, #a8e6cf, #7fcdcd);
-            color: #2c3e50;
-        }
-
-        .result-error {
-            background: linear-gradient(135deg, #ffb3ba, #ffcccb);
-            color: #721c24;
-        }
-
-        .blood-group-display {
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 1rem 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .confidence-bar {
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success-color), var(--info-color));
-            transition: width 1s ease;
-        }
-
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            margin: 2rem 0;
-        }
-
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            border-width: 0.3em;
-            color: var(--primary-color);
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            margin: 1rem 0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-
-        .info-section {
-            background: rgba(52, 152, 219, 0.1);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .info-section h5 {
-            color: var(--info-color);
-            margin-bottom: 1rem;
-        }
-
-        .supported-formats {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .format-badge {
-            background: var(--info-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.85rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container main-container">
-        <div class="row justify-content-center w-100">
-            <div class="col-md-8 col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-microscope fa-2x mb-3"></i>
-                        <h1>Blood Group Classifier</h1>
-                        <p class="subtitle">AI-powered blood type identification from microscopic images</p>
+{% block content %}
+<section class="hero-section pt-4">
+    <div class="container">
+        <div class="row g-4 align-items-start">
+            <div class="col-xl-4">
+                <div class="glass-card p-4">
+                    <h2 class="h4 text-accent mb-3">Upload Fingerprint Image</h2>
+                    <p class="text-secondary small mb-4">Drag and drop a fingerprint scan or select a file to let our AI estimate the blood group.</p>
+                    <form id="uploadForm" enctype="multipart/form-data" class="d-flex flex-column gap-3">
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt mb-3"></i>
+                            <h5 class="mb-1 text-white">Drop image here</h5>
+                            <p class="text-secondary small mb-0">or click to browse (PNG, JPG, BMP, GIF)</p>
+                            <input type="file" id="fileInput" name="file" accept=".png,.jpg,.jpeg,.bmp,.gif" hidden>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" id="uploadBtn" class="btn btn-cta w-100" disabled>
+                                <i class="fas fa-fingerprint me-2"></i>Analyze Fingerprint
+                            </button>
+                        </div>
+                    </form>
+                    <div class="facts-box mt-4" id="imagePreview" style="display:none;"></div>
+                    <div class="loading-spinner" id="loadingSpinner" style="display:none;">
+                        <div class="spinner-border" role="status"></div>
+                        <p class="mt-2 text-secondary">Analyzing fingerprint...</p>
                     </div>
-                    
-                    <div class="upload-section">
-                        <form id="uploadForm" enctype="multipart/form-data">
-                            <div class="upload-area" id="uploadArea">
-                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                                <h4>Drop your image here</h4>
-                                <p class="text-muted">or click to browse files</p>
-                                <input type="file" id="fileInput" name="file" class="file-input" accept=".png,.jpg,.jpeg,.bmp,.gif">
-                            </div>
-                            
-                            <div class="supported-formats">
-                                <span class="format-badge">PNG</span>
-                                <span class="format-badge">JPG</span>
-                                <span class="format-badge">BMP</span>
-                                <span class="format-badge">GIF</span>
-                            </div>
-                            
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-upload" disabled id="uploadBtn">
-                                    <i class="fas fa-search me-2"></i>Analyze Blood Group
-                                </button>
-                            </div>
-                        </form>
-                        
-                        <div class="loading-spinner" id="loadingSpinner">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Analyzing...</span>
-                            </div>
-                            <p class="mt-2">Analyzing your sample...</p>
-                        </div>
-                        
-                        <div id="imagePreview"></div>
-                        
-                        <div id="predictionResult" class="prediction-result" style="display: none;"></div>
-                        
-                        <div class="info-section">
-                            <h5><i class="fas fa-info-circle me-2"></i>How it works</h5>
-                            <p class="mb-2"><strong>1. Upload:</strong> Select a clear microscopic image of blood cells</p>
-                            <p class="mb-2"><strong>2. Analysis:</strong> Our AI model processes the image using deep learning</p>
-                            <p class="mb-0"><strong>3. Result:</strong> Get your blood group classification with confidence score</p>
-                        </div>
+                    <div class="facts-box mt-3">
+                        <h6 class="text-accent text-uppercase mb-2">Tips</h6>
+                        <ul class="text-secondary small mb-0 list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check-circle text-accent me-2"></i>Use clear, high-contrast fingerprint scans.</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-accent me-2"></i>Crop tightly around the fingerprint ridge pattern.</li>
+                            <li><i class="fas fa-check-circle text-accent me-2"></i>Supported formats: PNG, JPG, BMP, GIF.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
+            <div class="col-xl-8">
+                <div class="result-card" id="resultContainer" style="display:none;">
+                    <div class="row g-4 align-items-center mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="result-badge" id="predictedBadge">--</div>
+                            <p class="mb-0 text-secondary">Predicted Blood Group</p>
+                            <p class="h5 mt-2" id="confidenceText">Confidence: --</p>
+                        </div>
+                        <div class="col-md-8">
+                            <h3 class="section-title mb-3">Prediction Results</h3>
+                            <div class="progress-bar-slim mb-3">
+                                <span id="confidenceBar" style="width:0%;"></span>
+                            </div>
+                            <canvas id="probabilityChart" height="140"></canvas>
+                        </div>
+                    </div>
+                    <div class="top3-grid mb-4" id="top3Container"></div>
+                    <div class="facts-box">
+                        <h6 class="text-accent text-uppercase mb-2">Blood Group Facts</h6>
+                        <p class="text-secondary small mb-1" id="factText">Upload a fingerprint to see interesting facts about the predicted blood group.</p>
+                        <p class="text-secondary small mb-0">Reminder: This system is for educational and research purposes. Confirm results with certified laboratory tests.</p>
+                    </div>
+                </div>
+                <div class="result-card text-center" id="placeholderCard">
+                    <div class="position-relative d-inline-flex align-items-center justify-content-center mb-4" style="width:140px;height:140px;border-radius:50%;background:rgba(40,123,255,0.1);border:2px dashed rgba(77,157,255,0.4);">
+                        <i class="fas fa-fingerprint fa-3x text-accent"></i>
+                    </div>
+                    <h3 class="section-title mb-2">Awaiting Analysis</h3>
+                    <p class="text-secondary">Upload a fingerprint image to generate probabilities for each blood group and view detailed insights.</p>
+                </div>
+                <div id="errorAlert" class="alert alert-danger mt-3" style="display:none;"></div>
+            </div>
         </div>
     </div>
+</section>
+{% endblock %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const uploadForm = document.getElementById('uploadForm');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const predictionResult = document.getElementById('predictionResult');
-        const imagePreview = document.getElementById('imagePreview');
+{% block body_scripts %}
+{{ super() }}
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const resultContainer = document.getElementById('resultContainer');
+    const placeholderCard = document.getElementById('placeholderCard');
+    const predictedBadge = document.getElementById('predictedBadge');
+    const confidenceText = document.getElementById('confidenceText');
+    const confidenceBar = document.getElementById('confidenceBar');
+    const top3Container = document.getElementById('top3Container');
+    const factText = document.getElementById('factText');
+    const imagePreview = document.getElementById('imagePreview');
+    const errorAlert = document.getElementById('errorAlert');
 
-        // Handle drag and drop
+    const bloodFacts = {
+        'A+': 'A+ individuals can donate to A+ and AB+ recipients and are common in approximately 30% of the population.',
+        'A-': 'A- blood is rarer and often needed for emergency transfusions where Rh-negative blood is required.',
+        'B+': 'B+ donors can give to B+ and AB+ recipients; this type represents about 9% of people worldwide.',
+        'B-': 'B- is one of the rarest blood groups, making its donors highly valuable for B- and AB- patients.',
+        'AB+': 'AB+ is the universal recipient but can only donate to other AB+ recipients.',
+        'AB-': 'AB- is extremely rare (less than 1% globally) and can receive from all Rh-negative groups.',
+        'O+': 'O+ is the most common type and can donate to any Rh-positive recipient, covering roughly 38% of people.',
+        'O-': 'O- is the universal donor, critical for emergencies, and found in about 7% of the population.'
+    };
+
+    let probabilityChart;
+
+    function initChart() {
+        const ctx = document.getElementById('probabilityChart').getContext('2d');
+        probabilityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                datasets: [{
+                    label: 'Probability (%)',
+                    data: Array(8).fill(0),
+                    backgroundColor: 'rgba(77, 157, 255, 0.45)',
+                    borderColor: 'rgba(77, 157, 255, 0.9)',
+                    borderWidth: 1,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#b7c0d1' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    x: {
+                        ticks: { color: '#b7c0d1' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initChart();
         uploadArea.addEventListener('click', () => fileInput.click());
-        
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
         });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-        
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
@@ -295,125 +160,109 @@
                 handleFileSelect();
             }
         });
-
-        // Handle file selection
         fileInput.addEventListener('change', handleFileSelect);
+        uploadForm.addEventListener('submit', handleSubmit);
+    });
 
-        function handleFileSelect() {
-            const file = fileInput.files[0];
-            if (file) {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<i class="fas fa-search me-2"></i>Analyze Blood Group';
-                
-                // Show image preview
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imagePreview.innerHTML = `
-                        <div class="text-center">
-                            <img src="${e.target.result}" alt="Preview" class="preview-image">
-                            <p class="text-muted mt-2">Selected: ${file.name}</p>
-                        </div>
-                    `;
-                };
-                reader.readAsDataURL(file);
-            }
+    function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (file) {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-fingerprint me-2"></i>Analyze Fingerprint';
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.style.display = 'block';
+                imagePreview.innerHTML = `
+                    <h6 class="text-accent text-uppercase mb-2">Selected Image</h6>
+                    <img src="${e.target.result}" alt="Preview" class="preview-image mb-2" style="max-height:200px;object-fit:cover;width:100%;border-radius:16px;">
+                    <p class="text-secondary small mb-0">${file.name}</p>`;
+            };
+            reader.readAsDataURL(file);
+            errorAlert.style.display = 'none';
+        }
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        if (!fileInput.files.length) {
+            showError('Please select an image before analyzing.');
+            return;
         }
 
-        // Handle form submission
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            
-            // Show loading state
-            loadingSpinner.style.display = 'block';
-            uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
-            predictionResult.style.display = 'none';
-            
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                // Hide loading state
-                loadingSpinner.style.display = 'none';
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<i class="fas fa-search me-2"></i>Analyze Blood Group';
-                
-                // Show result
-                if (data.success) {
-                    const confidence = parseFloat(data.confidence);
-                    predictionResult.className = 'prediction-result result-success';
-                    const top3Html = (data.top3 || []).map((t, i) => `
-                        <div class="mt-3 text-start">
-                            <div class="d-flex justify-content-between">
-                                <strong>#${i+1} ${t.blood_group}</strong>
-                                <span>${t.confidence}</span>
-                            </div>
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: ${parseFloat(t.confidence)}%"></div>
-                            </div>
-                        </div>
-                    `).join('');
-                    predictionResult.innerHTML = `
-                        <i class="fas fa-check-circle fa-3x mb-3" style="color: #27ae60;"></i>
-                        <h3>Analysis Complete!</h3>
-                        <div class="blood-group-display">${data.blood_group}</div>
-                        <div class="confidence-bar">
-                            <div class="confidence-fill" style="width: ${confidence}%"></div>
-                        </div>
-                        <p><strong>Confidence:</strong> ${data.confidence}</p>
-                        <div class="mt-3">
-                            <h6 class="text-start">Top predictions</h6>
-                            ${top3Html}
-                        </div>
-                        <small class="text-muted">
-                            <i class="fas fa-info-circle me-1"></i>
-                            This result is for informational purposes only. Please consult a medical professional for confirmation.
-                        </small>
-                    `;
-                } else {
-                    predictionResult.className = 'prediction-result result-error';
-                    predictionResult.innerHTML = `
-                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                        <h3>Analysis Failed</h3>
-                        <p>${data.error || 'An error occurred during analysis'}</p>
-                        <small>Please try again with a different image</small>
-                    `;
-                }
-                
-                predictionResult.style.display = 'block';
-                
-            } catch (error) {
-                loadingSpinner.style.display = 'none';
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<i class="fas fa-search me-2"></i>Analyze Blood Group';
-                
-                predictionResult.className = 'prediction-result result-error';
-                predictionResult.innerHTML = `
-                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                    <h3>Connection Error</h3>
-                    <p>Unable to connect to the server. Please try again.</p>
-                `;
-                predictionResult.style.display = 'block';
-            }
-        });
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
 
-        // Reset form when clicking on upload area after successful prediction
-        uploadArea.addEventListener('click', () => {
-            if (predictionResult.style.display === 'block') {
-                predictionResult.style.display = 'none';
-                imagePreview.innerHTML = '';
-                fileInput.value = '';
-                uploadBtn.disabled = true;
-                uploadBtn.innerHTML = '<i class="fas fa-search me-2"></i>Analyze Blood Group';
+        loadingSpinner.style.display = 'block';
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+        errorAlert.style.display = 'none';
+
+        try {
+            const response = await fetch('/predict', { method: 'POST', body: formData });
+            const data = await response.json();
+            loadingSpinner.style.display = 'none';
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-fingerprint me-2"></i>Analyze Fingerprint';
+
+            if (data.success) {
+                populateResults(data);
+            } else {
+                showError(data.error || 'An error occurred during analysis.');
             }
-        });
-    </script>
-</body>
-</html>
+        } catch (error) {
+            loadingSpinner.style.display = 'none';
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-fingerprint me-2"></i>Analyze Fingerprint';
+            showError('Unable to connect to the server. Please try again.');
+        }
+    }
+
+    function populateResults(data) {
+        placeholderCard.style.display = 'none';
+        resultContainer.style.display = 'block';
+        predictedBadge.textContent = data.blood_group || '--';
+        confidenceText.textContent = `Confidence: ${data.confidence || '--'}`;
+        const numericConfidence = parseFloat(data.confidence) || 0;
+        confidenceBar.style.width = `${numericConfidence}%`;
+
+        if (probabilityChart) {
+            const labelOrder = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+            const dataset = labelOrder.map(label => {
+                const entry = (data.top3 || []).find(item => item.blood_group === label);
+                if (entry) {
+                    return parseFloat(entry.confidence);
+                }
+                if (label === data.blood_group) {
+                    return numericConfidence;
+                }
+                return 0;
+            });
+            probabilityChart.data.datasets[0].data = dataset;
+            probabilityChart.update();
+        }
+
+        top3Container.innerHTML = (data.top3 || []).map((item, index) => {
+            const value = parseFloat(item.confidence).toFixed(2);
+            return `
+                <div class="top3-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold">#${index + 1} ${item.blood_group}</span>
+                        <span class="text-secondary">${value}%</span>
+                    </div>
+                    <div class="progress-bar-slim">
+                        <span style="width:${value}%;"></span>
+                    </div>
+                </div>`;
+        }).join('');
+
+        factText.textContent = bloodFacts[data.blood_group] || 'No additional information available for this blood group.';
+    }
+
+    function showError(message) {
+        errorAlert.textContent = message;
+        errorAlert.style.display = 'block';
+        resultContainer.style.display = 'none';
+        placeholderCard.style.display = 'block';
+    }
+</script>
+{% endblock %}

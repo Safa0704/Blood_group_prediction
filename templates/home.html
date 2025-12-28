@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}BloodPrint • Home{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="hero-background-overlay"></div>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="text-uppercase text-accent fw-semibold small">BloodPrint AI</span>
+                <h1 class="hero-heading">Blood Group Detection from Fingerprint</h1>
+                <h2 class="hero-subheading">Advanced CNN powered diagnostics</h2>
+                <p class="hero-description mb-4">Upload a fingerprint image and our advanced AI will estimate the blood group using deep learning convolution technology. Experience rapid, visually-rich insights designed for labs and project demos.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/classify" class="btn btn-primary-solid">
+                        <i class="fas fa-play me-2"></i>Try Now
+                    </a>
+                    <a href="/about" class="btn btn-outline-dark">Learn More</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-fingerprint">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<footer class="pb-5">
+    <div class="container text-center">
+        <p class="footer-note mb-0">© {{ current_year|default(2025) }} BloodPrint AI • For research and educational use only.</p>
+    </div>
+</footer>
+{% endblock %}
+
+

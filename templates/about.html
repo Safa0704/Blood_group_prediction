@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}BloodPrint • About{% endblock %}
+
+{% block content %}
+<section class="hero-section pt-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="glass-card p-4 p-lg-5">
+                    <div class="text-center mb-4">
+                        <h1 class="fw-semibold mb-2">About BloodPrint</h1>
+                        <p class="text-secondary mb-0">Revolutionizing blood group identification using fingerprint analysis and deep learning.</p>
+                    </div>
+                    <p class="text-secondary">BloodPrint is an innovative prototype that explores the correlation between fingerprint patterns and blood groups. Using a convolutional neural network trained on curated fingerprint datasets, the system provides probability-driven predictions intended for research, academic demonstrations, and rapid screening support.</p>
+                    <div class="row g-4 my-4">
+                        <div class="col-md-6 d-flex align-items-start gap-3">
+                            <div class="icon-bullet"><i class="fas fa-brain"></i></div>
+                            <div>
+                                <h5 class="text-accent mb-1">Deep Learning Core</h5>
+                                <p class="text-secondary mb-0">Transfer learning with TensorFlow/Keras leverages pre-trained feature extractors to capture dermatoglyphic minutiae.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-start gap-3">
+                            <div class="icon-bullet"><i class="fas fa-chart-line"></i></div>
+                            <div>
+                                <h5 class="text-accent mb-1">Explainable Confidence</h5>
+                                <p class="text-secondary mb-0">Top-three predictions with confidence percentages offer transparency into the model output.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-start gap-3">
+                            <div class="icon-bullet"><i class="fas fa-vial"></i></div>
+                            <div>
+                                <h5 class="text-accent mb-1">Lab-Friendly Workflow</h5>
+                                <p class="text-secondary mb-0">Simple upload experience that aligns with modern diagnostic dashboards for laboratory pilots.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-start gap-3">
+                            <div class="icon-bullet"><i class="fas fa-user-shield"></i></div>
+                            <div>
+                                <h5 class="text-accent mb-1">Human Oversight</h5>
+                                <p class="text-secondary mb-0">Designed as a decision-support tool; medical professionals must validate critical outcomes.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-secondary border-opacity-25">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="facts-box h-100">
+                                <h6 class="text-accent text-uppercase mb-2">Model Snapshot</h6>
+                                <ul class="text-secondary small mb-0 list-unstyled">
+                                    <li class="mb-2"><strong>Architecture:</strong> CNN with transfer learning</li>
+                                    <li class="mb-2"><strong>Accuracy:</strong> ~91% validation</li>
+                                    <li><strong>Classes:</strong> 8 blood groups</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="facts-box h-100">
+                                <h6 class="text-accent text-uppercase mb-2">Responsible Usage</h6>
+                                <p class="text-secondary small mb-3">BloodPrint is intended as a research and educational demonstrator. It should not be used as a standalone medical diagnostic. Always corroborate predictions with laboratory-grade testing and clinical judgement.</p>
+                                <a href="/classify" class="btn btn-cta btn-sm"><i class="fas fa-microscope me-2"></i>Try the Classifier</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
